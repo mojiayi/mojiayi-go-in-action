@@ -1,25 +1,97 @@
 package service
 
 import (
+	"mojiayi-the-rich/constants"
+	"mojiayi-the-rich/dao/mapper"
 	"mojiayi-the-rich/param"
+	"mojiayi-the-rich/utils"
 	"mojiayi-the-rich/vo"
+	"net/http"
+	"strings"
 
+	"strconv"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-basic/uuid"
 	"github.com/shopspring/decimal"
 )
 
-func CalculateWeight(param param.CurrencyParam) vo.CurrencyWeightVO {
-	data := new(vo.CurrencyWeightVO)
-	data.SetAmount(param.GetAmount())
-	data.SetName(param.GetName())
-	data.SetUnit(param.GetUnit())
+func CalculateWeight(context *gin.Context) {
+	traceId := uuid.New()
+	currencyCode := context.Query("currencyCode")
 
-	onePieceWeight := decimal.NewFromFloat(1.15)
-	pieceCount := decimal.NewFromInt(param.GetAmount()).Div(decimal.NewFromInt(param.GetUnit()))
-	oneThousand := decimal.NewFromFloat(1000)
-	weightInGram := onePieceWeight.Mul(pieceCount)
-	data.SetWeightInGram(weightInGram.InexactFloat64())
-	data.SetWeightInKiloGram(weightInGram.Div(oneThousand).InexactFloat64())
-	data.SetWeightInTon(weightInGram.Div(oneThousand).Div(oneThousand).InexactFloat64())
-	data.SetWeightInPound(weightInGram.Div(oneThousand).Mul(decimal.NewFromFloat(2.204)).InexactFloat64())
-	return *data
+	if len(currencyCode) == 0 {
+		utils.IllegalArgumentErrorResp("货币代号不能为空", traceId, context)
+		return
+	}
+
+	amountStr := context.Query("amount")
+	if len(amountStr) == 0 {
+		utils.IllegalArgumentErrorResp("货币金额不能为空", traceId, context)
+		return
+	}
+
+	amount, err := strconv.ParseInt(amountStr, 10, 64)
+	if err != nil {
+		utils.IllegalArgumentErrorResp("货币金额只能是数字", traceId, context)
+		return
+	}
+	if amount <= 0 {
+		utils.IllegalArgumentErrorResp("货币金额必须大于0", traceId, context)
+		return
+	}
+
+	nominalValueStr := context.Query("nominalValue")
+	if len(nominalValueStr) == 0 {
+		utils.IllegalArgumentErrorResp("货币单位不能为空", traceId, context)
+		return
+	}
+
+	nominalValue, err := strconv.ParseInt(nominalValueStr, 10, 64)
+	if err != nil {
+		utils.IllegalArgumentErrorResp("货币单位只能是数字", traceId, context)
+		return
+	}
+	if nominalValue <= 0 {
+		utils.IllegalArgumentErrorResp("货币单位必须大于0", traceId, context)
+		return
+	}
+
+	var param param.CurrencyParam = *new(param.CurrencyParam)
+	param.SetCurrencyCode(strings.ToUpper(currencyCode))
+	param.SetAmount(decimal.NewFromInt(amount))
+	param.SetNominalValue(decimal.NewFromInt(nominalValue))
+	param.SetTimestamp(int64(time.Millisecond))
+	param.SetTraceId(traceId)
+	// 以下2个字段，与业务本身无关，只是为了查看访问来源才加的
+	param.SetClientAgent(context.Request.UserAgent())
+	param.SetClientIP(context.ClientIP())
+
+	currencyWeightVO, err := calculateWeight(param)
+	if err != nil {
+		utils.ErrorResp(http.StatusGone, "计算失败，请重试！", traceId, context)
+		return
+	}
+	utils.SuccessResp(currencyWeightVO, traceId, context)
+}
+
+func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
+	currencyInfo, err := mapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
+	data := new(vo.CurrencyWeightVO)
+	if err != nil {
+		return *data, err
+	}
+
+	pieceCount := param.GetAmount().Div(param.GetNominalValue())
+
+	data.CurrencyCode = param.GetCurrencyCode()
+	data.Amount = param.GetAmount()
+	data.CurrencyName = currencyInfo.CurrencyName
+	data.NominalValue = currencyInfo.NominalValue
+	data.WeightInGram = currencyInfo.WeightInGram.Mul(pieceCount)
+	data.WeightInKiloGram = data.WeightInGram.Div(constants.ONE_THOUSAND)
+	data.WeightInTon = data.WeightInGram.Div(constants.ONE_THOUSAND).Div(constants.ONE_THOUSAND)
+	data.WeightInPound = data.WeightInGram.Div(constants.ONE_THOUSAND).Mul(decimal.NewFromFloat(2.204))
+	return *data, nil
 }
