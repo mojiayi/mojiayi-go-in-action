@@ -1,13 +1,14 @@
 package main
 
 import (
+	"mojiayi-the-rich/config"
 	"mojiayi-the-rich/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// config.InitMySQLDatasource()
+	config.LoadProjectConfig()
 
 	router := gin.Default()
 	currencyV1 := router.Group("/v1/currency")

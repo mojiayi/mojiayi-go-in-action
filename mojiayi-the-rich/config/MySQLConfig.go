@@ -1,10 +1,9 @@
 package config
 
-// var (
-// 	DB *gorm.DB
-// )
-
-// func InitMySQLDatasource() *gorm.DB {
-
-// 	return DB
-// }
+type MySQLConfig struct {
+	IP       string
+	Port     int
+	User     string
+	Password string
+	Database string
+}
