@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/fs"
 	"mojiayi-the-rich/config"
 	"mojiayi-the-rich/dao/mapper"
 	"mojiayi-the-rich/service"
@@ -32,6 +34,13 @@ func initDependencyInjection() {
 
 func initLog() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(logrus.InfoLevel)
+	dir := "d://data//weblog//mojiayi-the-rich"
+	os.Mkdir(dir, fs.ModePerm)
+	file, err := os.Create(dir + "//info.log")
+	if err != nil {
+		fmt.Println("初始化日志输出配置失败")
+		os.Exit(1)
+	}
+	logrus.SetOutput(file)
 }
