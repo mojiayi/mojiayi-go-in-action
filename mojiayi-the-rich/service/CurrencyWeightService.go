@@ -16,6 +16,7 @@ import (
 	"github.com/go-basic/uuid"
 	"github.com/go-eden/routine"
 	"github.com/shopspring/decimal"
+	"github.com/sirupsen/logrus"
 )
 
 var localTraceId = routine.NewLocalStorage()
@@ -33,6 +34,7 @@ func CalculateWeight(context *gin.Context) {
 		utils.IllegalArgumentErrorResp("货币代号不能为空", context)
 		return
 	}
+	logrus.Info("计算", currencyCode, "的重量")
 
 	amountStr := context.Query("amount")
 	if len(amountStr) == 0 {
