@@ -13,22 +13,15 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	DB *gorm.DB
-)
-
-func LoadProjectConfig() {
+func LoadProjectConfig() *dig.Container {
 	container := dig.New()
 
 	container.Provide(InitOption)
 	container.Provide(InitConfig)
-	container.Provide(InitPersistentConfig)
 	container.Provide(InitMySQLConfig)
+	container.Provide(InitMySQLDatasource)
 
-	err := container.Invoke(InitMySQLDatasource)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return container
 }
 
 func InitOption() (*Option, error) {
@@ -58,20 +51,7 @@ func InitMySQLConfig(cfg *ini.File) (*MySQLConfig, error) {
 	}, nil
 }
 
-func InitPersistentConfig(cfg *ini.File) (*PersistentConfig, error) {
-	var persistentConfig PersistentConfig
-
-	// mysql, err := InitMySQLConfig(cfg)
-	// if err != nil {
-	// return &persistentConfig, err
-	// }
-
-	// persistentConfig.MySQL = mysql
-	return &persistentConfig, nil
-}
-
 func InitMySQLDatasource(mysqlConfig *MySQLConfig) (*gorm.DB, error) {
-	// cannot depend on result objects: *config.PersistentConfig embeds a dig.Out
 	dsn := mysqlConfig.User + ":" + mysqlConfig.Password + "@tcp(" + mysqlConfig.IP + ":" + strconv.Itoa(mysqlConfig.Port) + ")/" + mysqlConfig.Database + "?charset=utf8mb4&parseTime=true&loc=Local"
 	DB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 

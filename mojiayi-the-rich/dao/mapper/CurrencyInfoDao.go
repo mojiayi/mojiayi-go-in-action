@@ -2,14 +2,20 @@ package mapper
 
 import (
 	"log"
-	"mojiayi-the-rich/config"
 	"mojiayi-the-rich/dao/domain"
 
 	"github.com/shopspring/decimal"
+	"gorm.io/gorm"
 )
 
+var db *gorm.DB
+
+func NewCurrencyInfoDao(DB *gorm.DB) {
+	db = DB
+}
+
 func SelectByCurrencyCode(currencyCode string, nominalValue decimal.Decimal) (currencyInfo domain.CurrencyInfo, err error) {
-	rows, err := config.DB.Raw("select * from currency_info where currency_code=? and nominal_value=?", currencyCode, nominalValue).Rows()
+	rows, err := db.Raw("select * from currency_info where currency_code=? and nominal_value=?", currencyCode, nominalValue).Rows()
 	var record domain.CurrencyInfo
 	if rows == nil {
 		log.Fatal("查询失败")
@@ -17,7 +23,7 @@ func SelectByCurrencyCode(currencyCode string, nominalValue decimal.Decimal) (cu
 	}
 	defer rows.Close()
 	for rows.Next() {
-		config.DB.ScanRows(rows, &record)
+		db.ScanRows(rows, &record)
 	}
 
 	return record, nil
