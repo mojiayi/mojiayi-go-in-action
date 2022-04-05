@@ -17,7 +17,7 @@ func main() {
 	initDependencyInjection()
 
 	router := gin.Default()
-	currencyV1 := router.Group("/v1/currency")
+	currencyV1 := router.Group("/api/v1/currency")
 	{
 		currencyV1.GET("/weight", service.CalculateWeight)
 		currencyV1.GET("/goods", service.CalculatePurchaseAmount)
