@@ -3,6 +3,7 @@ package mapper
 import (
 	"log"
 	"mojiayi-the-rich/dao/domain"
+	"mojiayi-the-rich/enums"
 
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ func NewCurrencyInfoDao(DB *gorm.DB) {
 }
 
 func SelectByCurrencyCode(currencyCode string, nominalValue decimal.Decimal) (currencyInfo domain.CurrencyInfo, err error) {
-	rows, err := db.Raw("select * from currency_info where currency_code=? and nominal_value=?", currencyCode, nominalValue).Rows()
+	rows, err := db.Raw("select * from currency_info where currency_code=? and nominal_value=? and delete_flag=?", currencyCode, nominalValue, enums.NORMAL).Rows()
 	var record domain.CurrencyInfo
 	if rows == nil {
 		log.Fatal("查询失败")
