@@ -6,32 +6,35 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-eden/routine"
 )
 
-func IllegalArgumentErrorResp(msg string, traceId string, context *gin.Context) {
+var localTraceId = routine.NewLocalStorage()
+
+func IllegalArgumentErrorResp(msg string, context *gin.Context) {
 	var resp vo.BaseVO = *new(vo.BaseVO)
 	resp.SetCode(http.StatusBadRequest)
 	resp.SetMsg(msg)
 	resp.SetTimestamp(time.Now().UnixMilli())
-	resp.SetTraceId(traceId)
+	resp.SetTraceId(localTraceId.Get().(string))
 	context.JSON(http.StatusOK, resp)
 }
 
-func ErrorResp(code int32, msg string, traceId string, context *gin.Context) {
+func ErrorResp(code int32, msg string, context *gin.Context) {
 	var resp vo.BaseVO = *new(vo.BaseVO)
 	resp.SetCode(code)
 	resp.SetMsg(msg)
 	resp.SetTimestamp(time.Now().UnixMilli())
-	resp.SetTraceId(traceId)
+	resp.SetTraceId(localTraceId.Get().(string))
 	context.JSON(http.StatusOK, resp)
 }
 
-func SuccessResp(data interface{}, traceId string, context *gin.Context) {
+func SuccessResp(data interface{}, context *gin.Context) {
 	var resp vo.BaseVO = vo.BaseVO{}
 	resp.SetCode(http.StatusOK)
 	resp.SetMsg(http.StatusText(http.StatusOK))
 	resp.SetTimestamp(time.Now().UnixMilli())
-	resp.SetTraceId(traceId)
+	resp.SetTraceId(localTraceId.Get().(string))
 	resp.SetData(data)
 	context.JSON(http.StatusOK, resp)
 }

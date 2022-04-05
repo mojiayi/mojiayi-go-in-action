@@ -14,47 +14,55 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-basic/uuid"
+	"github.com/go-eden/routine"
 	"github.com/shopspring/decimal"
 )
 
+var localTraceId = routine.NewLocalStorage()
+var localContext = routine.NewLocalStorage()
+
 func CalculateWeight(context *gin.Context) {
+	localContext.Set(context)
+
 	traceId := uuid.New()
+	localTraceId.Set(traceId)
+
 	currencyCode := context.Query("currencyCode")
 
 	if len(currencyCode) == 0 {
-		utils.IllegalArgumentErrorResp("货币代号不能为空", traceId, context)
+		utils.IllegalArgumentErrorResp("货币代号不能为空", context)
 		return
 	}
 
 	amountStr := context.Query("amount")
 	if len(amountStr) == 0 {
-		utils.IllegalArgumentErrorResp("货币金额不能为空", traceId, context)
+		utils.IllegalArgumentErrorResp("货币金额不能为空", context)
 		return
 	}
 
 	amount, err := strconv.ParseInt(amountStr, 10, 64)
 	if err != nil {
-		utils.IllegalArgumentErrorResp("货币金额只能是数字", traceId, context)
+		utils.IllegalArgumentErrorResp("货币金额只能是数字", context)
 		return
 	}
 	if amount <= 0 {
-		utils.IllegalArgumentErrorResp("货币金额必须大于0", traceId, context)
+		utils.IllegalArgumentErrorResp("货币金额必须大于0", context)
 		return
 	}
 
 	nominalValueStr := context.Query("nominalValue")
 	if len(nominalValueStr) == 0 {
-		utils.IllegalArgumentErrorResp("货币单位不能为空", traceId, context)
+		utils.IllegalArgumentErrorResp("货币单位不能为空", context)
 		return
 	}
 
 	nominalValue, err := strconv.ParseInt(nominalValueStr, 10, 64)
 	if err != nil {
-		utils.IllegalArgumentErrorResp("货币单位只能是数字", traceId, context)
+		utils.IllegalArgumentErrorResp("货币单位只能是数字", context)
 		return
 	}
 	if nominalValue <= 0 {
-		utils.IllegalArgumentErrorResp("货币单位必须大于0", traceId, context)
+		utils.IllegalArgumentErrorResp("货币单位必须大于0", context)
 		return
 	}
 
@@ -63,17 +71,16 @@ func CalculateWeight(context *gin.Context) {
 	param.SetAmount(decimal.NewFromInt(amount))
 	param.SetNominalValue(decimal.NewFromInt(nominalValue))
 	param.SetTimestamp(int64(time.Millisecond))
-	param.SetTraceId(traceId)
 	// 以下2个字段，与业务本身无关，只是为了查看访问来源才加的
 	param.SetClientAgent(context.Request.UserAgent())
 	param.SetClientIP(context.ClientIP())
 
 	currencyWeightVO, err := calculateWeight(param)
 	if err != nil {
-		utils.ErrorResp(http.StatusGone, "计算失败，请重试！", traceId, context)
+		utils.ErrorResp(http.StatusGone, "计算失败，请重试！", context)
 		return
 	}
-	utils.SuccessResp(currencyWeightVO, traceId, context)
+	utils.SuccessResp(currencyWeightVO, context)
 }
 
 func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
