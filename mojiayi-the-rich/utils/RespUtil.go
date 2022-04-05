@@ -6,17 +6,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-eden/routine"
 )
-
-var localTraceId = routine.NewLocalStorage()
 
 func IllegalArgumentErrorResp(msg string, context *gin.Context) {
 	var resp vo.BaseVO = *new(vo.BaseVO)
 	resp.SetCode(http.StatusBadRequest)
 	resp.SetMsg(msg)
 	resp.SetTimestamp(time.Now().UnixMilli())
-	resp.SetTraceId(localTraceId.Get().(string))
+	resp.SetTraceId(GetTraceId(context))
 	context.JSON(http.StatusOK, resp)
 }
 
@@ -25,7 +22,7 @@ func ErrorResp(code int32, msg string, context *gin.Context) {
 	resp.SetCode(code)
 	resp.SetMsg(msg)
 	resp.SetTimestamp(time.Now().UnixMilli())
-	resp.SetTraceId(localTraceId.Get().(string))
+	resp.SetTraceId(GetTraceId(context))
 	context.JSON(http.StatusOK, resp)
 }
 
@@ -34,7 +31,7 @@ func SuccessResp(data interface{}, context *gin.Context) {
 	resp.SetCode(http.StatusOK)
 	resp.SetMsg(http.StatusText(http.StatusOK))
 	resp.SetTimestamp(time.Now().UnixMilli())
-	resp.SetTraceId(localTraceId.Get().(string))
+	resp.SetTraceId(GetTraceId(context))
 	resp.SetData(data)
 	context.JSON(http.StatusOK, resp)
 }

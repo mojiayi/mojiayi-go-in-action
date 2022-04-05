@@ -13,21 +13,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-basic/uuid"
-	"github.com/go-eden/routine"
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 )
 
-var localTraceId = routine.NewLocalStorage()
-var localContext = routine.NewLocalStorage()
-
 func CalculateWeight(context *gin.Context) {
-	localContext.Set(context)
-
-	traceId := uuid.New()
-	localTraceId.Set(traceId)
-
 	currencyCode := context.Query("currencyCode")
 
 	if len(currencyCode) == 0 {
