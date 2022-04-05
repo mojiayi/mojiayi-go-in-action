@@ -11,7 +11,7 @@ import (
 func GetTraceId(context *gin.Context) (traceId string) {
 	traceId = context.Request.Header.Get(constants.TRACE_ID)
 	if len(traceId) == 0 {
-		traceId := uuid.New()
+		traceId = uuid.New()
 		context.Request.Header.Set(constants.TRACE_ID, traceId)
 		logrus.Info("上下文中没有traceId")
 	} else {
