@@ -2,7 +2,7 @@ package routers
 
 import (
 	"mojiayi-the-rich/middlewire"
-	"mojiayi-the-rich/service"
+	v1 "mojiayi-the-rich/routers/api/v1"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,8 +15,8 @@ func InitRouters() *gin.Engine {
 
 	currencyV1 := router.Group("/api/v1/currency")
 	{
-		currencyV1.GET("/weight", service.CalculateWeight)
-		currencyV1.GET("/goods", service.CalculatePurchaseAmount)
+		currencyV1.GET("/weight", v1.CalculateWeight)
+		currencyV1.GET("/goods", v1.CalculatePurchaseAmount)
 	}
 
 	return router

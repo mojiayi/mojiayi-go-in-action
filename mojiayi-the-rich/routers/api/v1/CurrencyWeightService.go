@@ -1,16 +1,16 @@
-package service
+package v1
 
 import (
 	"mojiayi-the-rich/constants"
 	"mojiayi-the-rich/dao/mapper"
 	"mojiayi-the-rich/middlewire"
 	"mojiayi-the-rich/param"
+	"mojiayi-the-rich/routers/api/validations"
 	"mojiayi-the-rich/utils"
 	"mojiayi-the-rich/vo"
 	"net/http"
 	"strings"
 
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,49 +19,34 @@ import (
 
 func CalculateWeight(context *gin.Context) {
 	currencyCode := context.Query("currencyCode")
-
-	if len(currencyCode) == 0 {
-		utils.IllegalArgumentErrorResp("货币代号不能为空", context)
+	pass, errMsg := validations.NotEmpty(currencyCode, "货币代号")
+	if !pass {
+		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 	middlewire.MyLogger.Info("计算", currencyCode, "的重量")
 
 	amountStr := context.Query("amount")
-	if len(amountStr) == 0 {
-		utils.IllegalArgumentErrorResp("货币金额不能为空", context)
-		return
-	}
-
-	amount, err := strconv.ParseInt(amountStr, 10, 64)
-	if err != nil {
-		utils.IllegalArgumentErrorResp("货币金额只能是数字", context)
-		return
-	}
-	if amount <= 0 {
-		utils.IllegalArgumentErrorResp("货币金额必须大于0", context)
+	pass, errMsg = validations.GreaterThanZero(amountStr, "货币金额")
+	if !pass {
+		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
 	nominalValueStr := context.Query("nominalValue")
-	if len(nominalValueStr) == 0 {
-		utils.IllegalArgumentErrorResp("货币单位不能为空", context)
+	pass, errMsg = validations.GreaterThanZero(nominalValueStr, "货币单位")
+	if !pass {
+		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
-	nominalValue, err := strconv.ParseInt(nominalValueStr, 10, 64)
-	if err != nil {
-		utils.IllegalArgumentErrorResp("货币单位只能是数字", context)
-		return
-	}
-	if nominalValue <= 0 {
-		utils.IllegalArgumentErrorResp("货币单位必须大于0", context)
-		return
-	}
+	amount, _ := decimal.NewFromString(amountStr)
+	nominalValue, _ := decimal.NewFromString(nominalValueStr)
 
 	var param param.CurrencyParam = *new(param.CurrencyParam)
 	param.SetCurrencyCode(strings.ToUpper(currencyCode))
-	param.SetAmount(decimal.NewFromInt(amount))
-	param.SetNominalValue(decimal.NewFromInt(nominalValue))
+	param.SetAmount(amount)
+	param.SetNominalValue(nominalValue)
 	param.SetTimestamp(int64(time.Millisecond))
 	// 以下2个字段，与业务本身无关，只是为了查看访问来源才加的
 	param.SetClientAgent(context.Request.UserAgent())
