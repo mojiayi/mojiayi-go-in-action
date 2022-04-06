@@ -10,9 +10,9 @@ import (
 )
 
 func main() {
-	middlewire.SetupLogOutput()
-
 	initDependencyInjection()
+
+	middlewire.SetupLogOutput()
 
 	router := gin.Default()
 
@@ -28,4 +28,6 @@ func initDependencyInjection() {
 	container := config.LoadProjectConfig()
 
 	container.Invoke(mapper.NewCurrencyInfoDao)
+
+	container.Invoke(config.LoadLogOutputConfig)
 }

@@ -2,6 +2,7 @@ package middlewire
 
 import (
 	"fmt"
+	"mojiayi-the-rich/config"
 	"os"
 	"time"
 
@@ -13,10 +14,10 @@ var MyLogger *logrus.Logger
 var MetadataLogger *logrus.Logger
 
 func SetupLogOutput() {
-	path := "d://data//weblog//mojiayi-the-rich//"
-
-	MyLogger = initLog(path, "access.log")
-	MetadataLogger = initLog(path, "metadata.log")
+	// 打印请求中业务日志
+	MyLogger = initLog(config.LogOutputDir, "access.log")
+	// 打印请求的元数据信息
+	MetadataLogger = initLog(config.LogOutputDir, "metadata.log")
 }
 
 func initLog(path string, filename string) *logrus.Logger {
