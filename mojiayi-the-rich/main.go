@@ -19,9 +19,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(middlewire.CostTime())
-
-	currencyV1 := router.Group("/api/v1/currency")
+	currencyV1 := router.Group("/api/v1/currency").Use(middlewire.PutTraceIdAsHeader(), middlewire.CostTime())
 	{
 		currencyV1.GET("/weight", service.CalculateWeight)
 		currencyV1.GET("/goods", service.CalculatePurchaseAmount)
