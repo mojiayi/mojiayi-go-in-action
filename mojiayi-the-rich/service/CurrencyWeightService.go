@@ -3,6 +3,7 @@ package service
 import (
 	"mojiayi-the-rich/constants"
 	"mojiayi-the-rich/dao/mapper"
+	"mojiayi-the-rich/middlewire"
 	"mojiayi-the-rich/param"
 	"mojiayi-the-rich/utils"
 	"mojiayi-the-rich/vo"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
-	"github.com/sirupsen/logrus"
 )
 
 func CalculateWeight(context *gin.Context) {
@@ -24,7 +24,7 @@ func CalculateWeight(context *gin.Context) {
 		utils.IllegalArgumentErrorResp("货币代号不能为空", context)
 		return
 	}
-	logrus.Info("计算", currencyCode, "的重量")
+	middlewire.MyLogger.Info("计算", currencyCode, "的重量")
 
 	amountStr := context.Query("amount")
 	if len(amountStr) == 0 {

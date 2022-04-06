@@ -1,11 +1,47 @@
 package middlewire
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
+
+var MyLogger *logrus.Logger
+var MetadataLogger *logrus.Logger
+
+func SetupLogOutput() {
+	path := "d://data//weblog//mojiayi-the-rich//"
+
+	MyLogger = initLog(path, "access.log")
+	MetadataLogger = initLog(path, "metadata.log")
+}
+
+func initLog(path string, filename string) *logrus.Logger {
+	log := logrus.New()
+	log.Formatter = &logrus.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05.999999999",
+	}
+	filepath := path + filename
+	var file *os.File
+	var err error
+	if _, err = os.Stat(filepath); os.IsNotExist(err) {
+		file, err = os.Create(filepath)
+	} else {
+		file, err = os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	}
+
+	if err != nil {
+		fmt.Println("fail to open log file " + filepath)
+	}
+
+	log.Out = file
+	log.Level = logrus.InfoLevel
+
+	return log
+}
 
 func CostTime() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -13,7 +49,12 @@ func CostTime() gin.HandlerFunc {
 
 		ctx.Next()
 
-		costTime := time.Since(startTime)
-		logrus.Info("uri=", ctx.Request.RequestURI+",costTime=", costTime.Milliseconds())
+		MetadataLogger.WithFields(logrus.Fields{
+			"cost":   time.Since(startTime).Milliseconds(),
+			"ip":     ctx.ClientIP(),
+			"method": ctx.Request.Method,
+			"uri":    ctx.Request.RequestURI,
+			"usage":  "metadata",
+		}).Info("request metadata")
 	}
 }

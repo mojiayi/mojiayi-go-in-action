@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-basic/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 func PutTraceIdAsHeader() gin.HandlerFunc {
@@ -23,9 +22,9 @@ func GetTraceId(ctx *gin.Context) string {
 		traceId = uuid.New()
 		traceId = strings.ReplaceAll(traceId, "-", "")
 		ctx.Request.Header.Set(constants.TRACE_ID, traceId)
-		logrus.Info("生成新traceId=", traceId)
+		MyLogger.Info("生成新traceId=", traceId)
 	} else {
-		logrus.Info("从header中取得traceId=", traceId)
+		MyLogger.Info("从header中取得traceId=", traceId)
 	}
 	return traceId
 }
