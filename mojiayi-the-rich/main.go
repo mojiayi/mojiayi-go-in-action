@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"mojiayi-the-rich/config"
 	"mojiayi-the-rich/dao/mapper"
+	"mojiayi-the-rich/middlewire"
 	"mojiayi-the-rich/service"
 	"os"
 
@@ -17,13 +18,15 @@ func main() {
 	initDependencyInjection()
 
 	router := gin.Default()
+
+	router.Use(middlewire.CostTime())
+
 	currencyV1 := router.Group("/api/v1/currency")
 	{
 		currencyV1.GET("/weight", service.CalculateWeight)
 		currencyV1.GET("/goods", service.CalculatePurchaseAmount)
 	}
 	router.Run(":8080")
-	logrus.Info("启动项目mojiayi-the-rich成功")
 }
 
 func initDependencyInjection() {
