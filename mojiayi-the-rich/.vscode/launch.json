@@ -13,7 +13,7 @@
             "program": "D:\\SourceCode\\github\\mojiayi-go-in-action\\mojiayi-the-rich\\main.go",
             "args": [
                 "-c",
-                "./config/my.ini"
+                "./setting/my.ini"
             ]
         } 
     ]

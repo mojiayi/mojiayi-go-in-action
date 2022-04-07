@@ -2,7 +2,7 @@ package middlewire
 
 import (
 	"fmt"
-	"mojiayi-the-rich/config"
+	"mojiayi-the-rich/setting"
 	"os"
 	"time"
 
@@ -15,9 +15,9 @@ var MetadataLogger *logrus.Logger
 
 func SetupLogOutput() {
 	// 打印请求中业务日志
-	MyLogger = initLog(config.LogOutputDir, "access.log")
+	MyLogger = initLog(setting.LogOutSetting.Dir, "access.log")
 	// 打印请求的元数据信息
-	MetadataLogger = initLog(config.LogOutputDir, "metadata.log")
+	MetadataLogger = initLog(setting.LogOutSetting.Dir, "metadata.log")
 }
 
 func initLog(path string, filename string) *logrus.Logger {
