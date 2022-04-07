@@ -2,6 +2,7 @@ package middlewire
 
 import (
 	"mojiayi-the-rich/constants"
+	"mojiayi-the-rich/setting"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -22,9 +23,9 @@ func GetTraceId(ctx *gin.Context) string {
 		traceId = uuid.New()
 		traceId = strings.ReplaceAll(traceId, "-", "")
 		ctx.Request.Header.Set(constants.TRACE_ID, traceId)
-		MyLogger.Info("生成新traceId=", traceId)
+		setting.MyLogger.Info("生成新traceId=", traceId)
 	} else {
-		MyLogger.Info("从header中取得traceId=", traceId)
+		setting.MyLogger.Info("从header中取得traceId=", traceId)
 	}
 	return traceId
 }

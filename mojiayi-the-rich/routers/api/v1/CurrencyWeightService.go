@@ -3,9 +3,9 @@ package v1
 import (
 	"mojiayi-the-rich/constants"
 	"mojiayi-the-rich/dao/mapper"
-	"mojiayi-the-rich/middlewire"
 	"mojiayi-the-rich/param"
 	"mojiayi-the-rich/routers/api/validations"
+	"mojiayi-the-rich/setting"
 	"mojiayi-the-rich/utils"
 	"mojiayi-the-rich/vo"
 	"net/http"
@@ -24,7 +24,7 @@ func CalculateWeight(context *gin.Context) {
 		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
-	middlewire.MyLogger.Info("计算", currencyCode, "的重量")
+	setting.MyLogger.Info("计算", currencyCode, "的重量")
 
 	amountStr := context.Query("amount")
 	pass, errMsg = validations.GreaterThanZero(amountStr, "货币金额")
