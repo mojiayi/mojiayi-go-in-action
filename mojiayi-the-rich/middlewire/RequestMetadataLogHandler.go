@@ -1,7 +1,6 @@
 package middlewire
 
 import (
-	"mojiayi-the-rich/constants"
 	"mojiayi-the-rich/setting"
 	"time"
 
@@ -16,12 +15,11 @@ func CostTime() gin.HandlerFunc {
 		ctx.Next()
 
 		setting.MetadataLogger.WithFields(logrus.Fields{
-			"cost":             time.Since(startTime).Milliseconds(),
-			"ip":               ctx.ClientIP(),
-			"method":           ctx.Request.Method,
-			"uri":              ctx.Request.RequestURI,
-			constants.TRACE_ID: GetTraceId(),
-			"usage":            "metadata",
-		}).Info("request metadata")
+			"cost":   time.Since(startTime).Milliseconds(),
+			"ip":     ctx.ClientIP(),
+			"method": ctx.Request.Method,
+			"uri":    ctx.Request.RequestURI,
+			"usage":  "metadata",
+		}).Info("requestMetadata")
 	}
 }

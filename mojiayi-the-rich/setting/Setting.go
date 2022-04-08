@@ -1,8 +1,14 @@
 package setting
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/go-basic/uuid"
+	"github.com/go-eden/routine"
 	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/ini.v1"
@@ -55,9 +61,8 @@ func setupLogOutput() {
 
 func initLog(path string, filename string) *logrus.Logger {
 	log := logrus.New()
-	log.Formatter = &logrus.JSONFormatter{
-		TimestampFormat: "2006-01-02 15:04:05.999999999",
-	}
+	log.Formatter = &MyLogFormatter{}
+
 	filepath := path + filename
 	var file *os.File
 	var err error
@@ -75,4 +80,48 @@ func initLog(path string, filename string) *logrus.Logger {
 	log.Level = logrus.InfoLevel
 
 	return log
+}
+
+type MyLogFormatter struct {
+}
+
+func (m *MyLogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	var buffer *bytes.Buffer
+	if entry.Buffer != nil {
+		buffer = entry.Buffer
+	} else {
+		buffer = &bytes.Buffer{}
+	}
+
+	var requestMetadata = make(map[string]interface{})
+	for k, v := range entry.Data {
+		requestMetadata[k] = v
+	}
+	str, _ := json.Marshal(requestMetadata)
+
+	timestamp := entry.Time.Format("2006-01-02 15:04:05")
+	var newLog = fmt.Sprintf("%s|%s|%s|%s|%s\n", timestamp, entry.Level, GetTraceId(), entry.Message, string(str))
+	buffer.WriteString(newLog)
+	return buffer.Bytes(), nil
+}
+
+var localTraceId = routine.NewLocalStorage()
+
+func PutTraceIdAsHeader() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		GetTraceId()
+
+		ctx.Next()
+	}
+}
+
+func GetTraceId() string {
+	var traceId = ""
+	if localTraceId.Get() == nil {
+		traceId = strings.ReplaceAll(uuid.New(), "-", "")
+		localTraceId.Set(traceId)
+	} else {
+		traceId = localTraceId.Get().(string)
+	}
+	return traceId
 }
