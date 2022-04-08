@@ -43,16 +43,16 @@ func CalculateWeight(context *gin.Context) {
 	amount, _ := decimal.NewFromString(amountStr)
 	nominalValue, _ := decimal.NewFromString(nominalValueStr)
 
-	var param param.CurrencyParam = *new(param.CurrencyParam)
-	param.SetCurrencyCode(strings.ToUpper(currencyCode))
-	param.SetAmount(amount)
-	param.SetNominalValue(nominalValue)
-	param.SetTimestamp(int64(time.Millisecond))
+	var currencyParam = *new(param.CurrencyParam)
+	currencyParam.SetCurrencyCode(strings.ToUpper(currencyCode))
+	currencyParam.SetAmount(amount)
+	currencyParam.SetNominalValue(nominalValue)
+	currencyParam.SetTimestamp(int64(time.Millisecond))
 	// 以下2个字段，与业务本身无关，只是为了查看访问来源才加的
-	param.SetClientAgent(context.Request.UserAgent())
-	param.SetClientIP(context.ClientIP())
+	currencyParam.SetClientAgent(context.Request.UserAgent())
+	currencyParam.SetClientIP(context.ClientIP())
 
-	currencyWeightVO, err := calculateWeight(param)
+	currencyWeightVO, err := calculateWeight(currencyParam)
 	if err != nil {
 		utils.ErrorResp(http.StatusGone, "计算失败，请重试！", context)
 		return
