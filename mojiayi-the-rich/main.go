@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"mojiayi-the-rich/dao"
 	"mojiayi-the-rich/routers"
 	"mojiayi-the-rich/setting"
@@ -13,5 +14,8 @@ func main() {
 
 	router := routers.InitRouters()
 
-	router.Run(":8080")
+	err := router.Run(":8080")
+	if err != nil {
+		fmt.Errorf("启动失败,err=%v", err)
+	}
 }
