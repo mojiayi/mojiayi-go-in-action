@@ -16,13 +16,10 @@ func QueryAvailableCurrency(ctx *gin.Context) {
 	pageResult := dao.BasePageResult{}
 	pageResult.CurrentPage = utils.GetCurrentPage(ctx)
 	pageResult.PageSize = utils.GetPageSize(ctx)
-	currencyCode := ctx.Query("currencyCode")
-	wrapper := make(map[string]interface{}, 0)
-	if currencyCode != "" {
-		wrapper["currency_code"] = currencyCode
-	}
 
-	total := currencyInfo.CountByCondition(wrapper)
+	currencyCode := ctx.Query("currencyCode")
+
+	total := currencyInfo.CountByCondition(currencyCode)
 	pageResult.Total = total
 	if total == 0 {
 		pageResult.Pages = 0
@@ -30,7 +27,7 @@ func QueryAvailableCurrency(ctx *gin.Context) {
 		utils.SuccessResp(&pageResult, ctx)
 		return
 	}
-	list, err := currencyInfo.PageByCondition(&pageResult, wrapper)
+	list, err := currencyInfo.PageByCondition(&pageResult, currencyCode)
 	if err != nil {
 		pageResult.Pages = 0
 		pageResult.Data = make(map[string]interface{}, 0)
