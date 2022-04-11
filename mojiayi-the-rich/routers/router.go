@@ -17,6 +17,7 @@ func InitRouters() *gin.Engine {
 	currencyV1 := router.Group("/api/v1/currency")
 	{
 		currencyV1.GET("/weight", v1.CalculateWeight)
+		currencyV1.GET("/list", v1.QueryAvailableCurrency)
 		currencyV1.GET("/goods", v1.CalculatePurchaseAmount)
 	}
 

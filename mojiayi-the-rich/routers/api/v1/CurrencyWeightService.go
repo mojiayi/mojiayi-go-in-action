@@ -61,7 +61,10 @@ func CalculateWeight(context *gin.Context) {
 }
 
 func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
-	currencyInfo, err := mapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
+	wrapper := make(map[string]interface{})
+	wrapper["currency_code"] = param.GetCurrencyCode()
+	wrapper["nominal_value"] = param.GetNominalValue()
+	currencyInfo, err := mapper.SelectByCurrencyCode(wrapper)
 	data := new(vo.CurrencyWeightVO)
 	if err != nil {
 		return *data, err
