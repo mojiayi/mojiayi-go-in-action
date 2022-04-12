@@ -2,15 +2,12 @@ package main
 
 import (
 	"fmt"
-	"mojiayi-the-rich/dao"
 	"mojiayi-the-rich/routers"
 	"mojiayi-the-rich/setting"
 )
 
 func main() {
 	setting.Setup()
-
-	dao.Setup()
 
 	router := routers.InitRouters()
 

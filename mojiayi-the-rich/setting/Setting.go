@@ -7,6 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-basic/uuid"
 	"github.com/go-eden/routine"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"os"
 	"strings"
 
@@ -14,8 +17,8 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-var MySQLSetting = &MySQLConfig{}
-var LogOutSetting = &LogOutputConfig{}
+var mySQLSetting = &MySQLConfig{}
+var logOutSetting = &LogOutputConfig{}
 var MyLogger *logrus.Logger
 var MetadataLogger *logrus.Logger
 var cfg *ini.File
@@ -27,10 +30,12 @@ func Setup() {
 		fmt.Println("failed while load setting file setting/my.ini,err: ", err)
 	}
 
-	mapTo("mysql", MySQLSetting)
-	mapTo("log", LogOutSetting)
+	mapTo("mysql", mySQLSetting)
+	mapTo("log", logOutSetting)
 
 	setupLogOutput()
+
+	setupMySQL()
 }
 
 type MySQLConfig struct {
@@ -54,9 +59,9 @@ func mapTo(section string, value interface{}) {
 
 func setupLogOutput() {
 	// 打印请求中业务日志
-	MyLogger = initLog(LogOutSetting.Dir, "access.log")
+	MyLogger = initLog(logOutSetting.Dir, "access.log")
 	// 打印请求的元数据信息
-	MetadataLogger = initLog(LogOutSetting.Dir, "metadata.log")
+	MetadataLogger = initLog(logOutSetting.Dir, "metadata.log")
 }
 
 func initLog(path string, filename string) *logrus.Logger {
@@ -128,4 +133,23 @@ func GetTraceId() string {
 
 func RemoveTraceId() {
 	localTraceId.Del()
+}
+
+var DB *gorm.DB
+
+func setupMySQL() {
+	var err error
+	var dbUrl = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		mySQLSetting.User,
+		mySQLSetting.Password,
+		mySQLSetting.IP,
+		mySQLSetting.Port,
+		mySQLSetting.Database)
+	DB, err = gorm.Open(mysql.Open(dbUrl), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{SingularTable: true},
+	})
+
+	if err != nil {
+		fmt.Println("models setup err:", err)
+	}
 }

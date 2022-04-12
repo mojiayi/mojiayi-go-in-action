@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"mojiayi-the-rich/dao"
+	"mojiayi-the-rich/dao/domain"
 	"mojiayi-the-rich/dao/mapper"
 	"mojiayi-the-rich/utils"
 )
@@ -10,16 +10,17 @@ import (
 type CurrencyInfoService struct {
 }
 
-var currencyInfo mapper.CurrencyInfo
+var currencyInfoMapper mapper.CurrencyInfoMapper
+var paginateUtil utils.PaginateUtil
 
 func QueryAvailableCurrency(ctx *gin.Context) {
-	pageResult := dao.BasePageResult{}
-	pageResult.CurrentPage = utils.GetCurrentPage(ctx)
-	pageResult.PageSize = utils.GetPageSize(ctx)
+	pageResult := domain.BasePageResult{}
+	pageResult.CurrentPage = paginateUtil.GetCurrentPage(ctx)
+	pageResult.PageSize = paginateUtil.GetPageSize(ctx)
 
 	currencyCode := ctx.Query("currencyCode")
 
-	total := currencyInfo.CountByCondition(currencyCode)
+	total := currencyInfoMapper.CountByCondition(currencyCode)
 	pageResult.Total = total
 	if total == 0 {
 		pageResult.Pages = 0
@@ -27,7 +28,7 @@ func QueryAvailableCurrency(ctx *gin.Context) {
 		utils.SuccessResp(&pageResult, ctx)
 		return
 	}
-	list, err := currencyInfo.PageByCondition(&pageResult, currencyCode)
+	list, err := currencyInfoMapper.PageByCondition(&pageResult, currencyCode)
 	if err != nil {
 		pageResult.Pages = 0
 		pageResult.Data = make(map[string]interface{}, 0)

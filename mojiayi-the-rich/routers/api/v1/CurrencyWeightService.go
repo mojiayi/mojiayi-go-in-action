@@ -61,7 +61,7 @@ func CalculateWeight(context *gin.Context) {
 }
 
 func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
-	record, err := currencyInfo.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
+	record, err := currencyInfoMapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
 	data := new(vo.CurrencyWeightVO)
 	if err != nil {
 		setting.MyLogger.Info("货币不存在,currencyCode=", param.GetCurrencyCode(), ",nominalValue=", param.GetNominalValue())
