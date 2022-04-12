@@ -15,6 +15,7 @@ func IllegalArgumentErrorResp(msg string, context *gin.Context) {
 	resp.SetMsg(msg)
 	resp.SetTimestamp(time.Now().UnixMilli())
 	resp.SetTraceId(setting.GetTraceId())
+	resp.SetData(make(map[string]string, 0))
 	context.JSON(http.StatusOK, resp)
 }
 
@@ -24,6 +25,7 @@ func ErrorResp(code int, msg string, context *gin.Context) {
 	resp.SetMsg(msg)
 	resp.SetTimestamp(time.Now().UnixMilli())
 	resp.SetTraceId(setting.GetTraceId())
+	resp.SetData(make(map[string]string, 0))
 	context.JSON(http.StatusOK, resp)
 }
 
