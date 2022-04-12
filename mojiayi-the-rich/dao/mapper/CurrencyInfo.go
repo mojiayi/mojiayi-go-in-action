@@ -9,7 +9,7 @@ type CurrencyInfo struct {
 	dao.BaseModel
 
 	CurrencyCode string          `json:"currency_code"`
-	CurrencyType int32           `json:"currency_type"`
+	CurrencyType int             `json:"currency_type"`
 	CurrencyName string          `json:"currency_name"`
 	NominalValue decimal.Decimal `json:"nominal_value"`
 	WeightInGram decimal.Decimal `json:"weight_in_gram"`
@@ -32,7 +32,7 @@ func SelectByCurrencyCode(currencyCode string, nominal decimal.Decimal) (currenc
 	return record, nil
 }
 
-func (c *CurrencyInfo) CountByCondition(currencyCode string) int32 {
+func (c *CurrencyInfo) CountByCondition(currencyCode string) int {
 	wrapper := make(map[string]interface{}, 0)
 	if currencyCode != "" {
 		wrapper["currency_code"] = currencyCode
@@ -41,7 +41,7 @@ func (c *CurrencyInfo) CountByCondition(currencyCode string) int32 {
 	var total int64
 	dao.DB.Model(&CurrencyInfo{}).Where(wrapper).Count(&total)
 
-	return int32(total)
+	return int(total)
 }
 
 func (c *CurrencyInfo) PageByCondition(pageResult *dao.BasePageResult, currencyCode string) (list interface{}, err error) {

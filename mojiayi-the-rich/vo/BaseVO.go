@@ -7,7 +7,7 @@ type BaseVO struct {
 	/*
 	* 请求状态码，使用 net/http中的标准状态码
 	 */
-	Code int32
+	Code int
 	/*
 	* 请求提示信息，当状态码为失败的值时，需要展示给用户
 	 */
@@ -26,11 +26,11 @@ type BaseVO struct {
 	Data interface{}
 }
 
-func (v *BaseVO) GetCode() int32 {
+func (v *BaseVO) GetCode() int {
 	return v.Code
 }
 
-func (v *BaseVO) SetCode(code int32) *BaseVO {
+func (v *BaseVO) SetCode(code int) *BaseVO {
 	v.Code = code
 	return v
 }

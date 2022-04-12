@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	DefaultCurrentPage int32 = 1
-	DefaultPageSize    int32 = 10
-	MaxPageSize        int32 = 200
+	DefaultCurrentPage int = 1
+	DefaultPageSize    int = 10
+	MaxPageSize        int = 200
 )
 
-func GetCurrentPage(ctx *gin.Context) int32 {
+func GetCurrentPage(ctx *gin.Context) int {
 	tempStr := ctx.Query("currentPage")
 	if tempStr == "" {
 		return DefaultCurrentPage
@@ -23,10 +23,10 @@ func GetCurrentPage(ctx *gin.Context) int32 {
 	if currentPage <= 0 {
 		return DefaultCurrentPage
 	}
-	return int32(currentPage)
+	return int(currentPage)
 }
 
-func GetPageSize(ctx *gin.Context) int32 {
+func GetPageSize(ctx *gin.Context) int {
 	tempStr := ctx.Query("pageSize")
 	if tempStr == "" {
 		return DefaultPageSize
@@ -35,8 +35,8 @@ func GetPageSize(ctx *gin.Context) int32 {
 	if err != nil {
 		return DefaultPageSize
 	}
-	if pageSize <= 0 || int32(pageSize) > MaxPageSize {
+	if pageSize <= 0 || int(pageSize) > MaxPageSize {
 		return DefaultPageSize
 	}
-	return int32(pageSize)
+	return int(pageSize)
 }

@@ -18,7 +18,7 @@ func IllegalArgumentErrorResp(msg string, context *gin.Context) {
 	context.JSON(http.StatusOK, resp)
 }
 
-func ErrorResp(code int32, msg string, context *gin.Context) {
+func ErrorResp(code int, msg string, context *gin.Context) {
 	var resp = *new(vo.BaseVO)
 	resp.SetCode(code)
 	resp.SetMsg(msg)
