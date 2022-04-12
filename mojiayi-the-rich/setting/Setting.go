@@ -125,3 +125,7 @@ func GetTraceId() string {
 	}
 	return traceId
 }
+
+func RemoveTraceId() {
+	localTraceId.Del()
+}
