@@ -24,7 +24,6 @@ func CalculateWeight(context *gin.Context) {
 		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
-	setting.MyLogger.Info("计算", currencyCode, "的重量")
 
 	amountStr := context.Query("amount")
 	pass, errMsg = validations.GreaterThanZero(amountStr, "货币金额")
@@ -43,6 +42,8 @@ func CalculateWeight(context *gin.Context) {
 	amount, _ := decimal.NewFromString(amountStr)
 	nominalValue, _ := decimal.NewFromString(nominalValueStr)
 
+	setting.MyLogger.Info("计算货币重量,currencyCode=", currencyCode, ",nominalValue=", nominalValue)
+
 	var currencyParam = *new(param.CurrencyParam)
 	currencyParam.SetCurrencyCode(strings.ToUpper(currencyCode))
 	currencyParam.SetAmount(amount)
@@ -54,7 +55,7 @@ func CalculateWeight(context *gin.Context) {
 
 	currencyWeightVO, err := calculateWeight(currencyParam)
 	if err != nil {
-		utils.ErrorResp(http.StatusGone, "计算失败，请重试！", context)
+		utils.ErrorResp(http.StatusGone, err.Error(), context)
 		return
 	}
 	utils.SuccessResp(currencyWeightVO, context)
@@ -64,6 +65,7 @@ func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWei
 	currencyInfo, err := mapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
 	data := new(vo.CurrencyWeightVO)
 	if err != nil {
+		setting.MyLogger.Info("货币不存在,currencyCode=", param.GetCurrencyCode(), ",nominalValue=", param.GetNominalValue())
 		return *data, err
 	}
 

@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"errors"
 	"github.com/shopspring/decimal"
 	"mojiayi-the-rich/dao"
 )
@@ -28,6 +29,10 @@ func SelectByCurrencyCode(currencyCode string, nominal decimal.Decimal) (currenc
 
 	var record CurrencyInfo
 	dao.DB.Model(&CurrencyInfo{}).Where(wrapper).Find(&record)
+
+	if record.ID == 0 {
+		return record, errors.New("货币" + currencyCode + "(" + nominal.String() + ")不存在")
+	}
 
 	return record, nil
 }
