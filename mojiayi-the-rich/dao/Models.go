@@ -2,6 +2,7 @@ package dao
 
 import (
 	"fmt"
+	"gorm.io/gorm/schema"
 	"mojiayi-the-rich/setting"
 	"time"
 
@@ -39,7 +40,9 @@ func Setup() {
 		setting.MySQLSetting.IP,
 		setting.MySQLSetting.Port,
 		setting.MySQLSetting.Database)
-	DB, err = gorm.Open(mysql.Open(dbUrl), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open(dbUrl), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{SingularTable: true},
+	})
 
 	if err != nil {
 		fmt.Println("models setup err:", err)
