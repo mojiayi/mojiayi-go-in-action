@@ -22,7 +22,7 @@ type CurrencyQueryInfo struct {
 	CurrencyCode string `json:"currency_code"`
 }
 
-func SelectByCurrencyCode(currencyCode string, nominal decimal.Decimal) (currencyInfo CurrencyInfo, err error) {
+func (c *CurrencyInfo) SelectByCurrencyCode(currencyCode string, nominal decimal.Decimal) (currencyInfo CurrencyInfo, err error) {
 	wrapper := make(map[string]interface{})
 	wrapper["currency_code"] = currencyCode
 	wrapper["nominal_value"] = nominal

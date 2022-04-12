@@ -2,7 +2,6 @@ package v1
 
 import (
 	"mojiayi-the-rich/constants"
-	"mojiayi-the-rich/dao/mapper"
 	"mojiayi-the-rich/param"
 	"mojiayi-the-rich/routers/api/validations"
 	"mojiayi-the-rich/setting"
@@ -62,7 +61,7 @@ func CalculateWeight(context *gin.Context) {
 }
 
 func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
-	currencyInfo, err := mapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
+	record, err := currencyInfo.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
 	data := new(vo.CurrencyWeightVO)
 	if err != nil {
 		setting.MyLogger.Info("货币不存在,currencyCode=", param.GetCurrencyCode(), ",nominalValue=", param.GetNominalValue())
@@ -73,9 +72,9 @@ func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWei
 
 	data.CurrencyCode = param.GetCurrencyCode()
 	data.Amount = param.GetAmount()
-	data.CurrencyName = currencyInfo.CurrencyName
-	data.NominalValue = currencyInfo.NominalValue
-	data.WeightInGram = currencyInfo.WeightInGram.Mul(pieceCount)
+	data.CurrencyName = record.CurrencyName
+	data.NominalValue = record.NominalValue
+	data.WeightInGram = record.WeightInGram.Mul(pieceCount)
 	data.WeightInKiloGram = data.WeightInGram.Div(constants.ONE_THOUSAND)
 	data.WeightInTon = data.WeightInGram.Div(constants.ONE_THOUSAND).Div(constants.ONE_THOUSAND)
 	data.WeightInPound = data.WeightInGram.Div(constants.ONE_THOUSAND).Mul(decimal.NewFromFloat(2.204))
