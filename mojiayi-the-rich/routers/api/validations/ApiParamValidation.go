@@ -4,24 +4,26 @@ import (
 	"strconv"
 )
 
-func NotEmpty(value string, key string) (bool, string) {
+type ApiParamValidation struct {
+}
+
+func (c *ApiParamValidation) NotEmpty(value string, key string) (bool, string) {
 	if len(value) == 0 {
 		return false, key + "不能为空"
 	}
 	return true, ""
 }
 
-func IsEmpty(value string, key string) (bool, string) {
+func (c *ApiParamValidation) IsEmpty(value string, key string) (bool, string) {
 	if len(value) != 0 {
 		return false, key + "必须为空"
 	}
 	return true, ""
 }
 
-func GreaterThanZero(value string, key string) (bool, string) {
-	pass, errMsg := NotEmpty(value, key)
-	if !pass {
-		return pass, errMsg
+func (c *ApiParamValidation) GreaterThanZero(value string, key string) (bool, string) {
+	if len(value) == 0 {
+		return false, key + "不能为空"
 	}
 	num, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {

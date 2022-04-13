@@ -13,7 +13,7 @@ type CurrencyInfoService struct {
 var currencyInfoMapper mapper.CurrencyInfoMapper
 var paginateUtil utils.PaginateUtil
 
-func QueryAvailableCurrency(ctx *gin.Context) {
+func (c *CurrencyInfoService) QueryAvailableCurrency(ctx *gin.Context) {
 	pageResult := domain.BasePageResult{}
 	pageResult.CurrentPage = paginateUtil.GetCurrentPage(ctx)
 	pageResult.PageSize = paginateUtil.GetPageSize(ctx)

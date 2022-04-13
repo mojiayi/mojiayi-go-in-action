@@ -2,6 +2,9 @@ package v1
 
 import "github.com/gin-gonic/gin"
 
-func CalculatePurchaseAmount(context *gin.Context) {
+type PurchaseGoodsService struct {
+}
+
+func (p *PurchaseGoodsService) CalculatePurchaseAmount(context *gin.Context) {
 
 }

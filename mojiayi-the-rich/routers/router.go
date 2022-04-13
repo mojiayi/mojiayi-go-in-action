@@ -8,6 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	currencyInfoService   v1.CurrencyInfoService
+	currencyWeightService v1.CurrencyWeightService
+	purchaseGoodsService  v1.PurchaseGoodsService
+)
+
 func InitRouters() *gin.Engine {
 	router := gin.New()
 
@@ -16,9 +22,9 @@ func InitRouters() *gin.Engine {
 
 	currencyV1 := router.Group("/api/v1/currency")
 	{
-		currencyV1.GET("/weight", v1.CalculateWeight)
-		currencyV1.GET("/list", v1.QueryAvailableCurrency)
-		currencyV1.GET("/goods", v1.CalculatePurchaseAmount)
+		currencyV1.GET("/weight", currencyWeightService.CalculateWeight)
+		currencyV1.GET("/list", currencyInfoService.QueryAvailableCurrency)
+		currencyV1.GET("/goods", purchaseGoodsService.CalculatePurchaseAmount)
 	}
 
 	return router

@@ -16,23 +16,28 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func CalculateWeight(context *gin.Context) {
+type CurrencyWeightService struct {
+}
+
+var apiParamValidation validations.ApiParamValidation
+
+func (c *CurrencyWeightService) CalculateWeight(context *gin.Context) {
 	currencyCode := context.Query("currencyCode")
-	pass, errMsg := validations.NotEmpty(currencyCode, "货币代号")
+	pass, errMsg := apiParamValidation.NotEmpty(currencyCode, "货币代号")
 	if !pass {
 		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
 	amountStr := context.Query("amount")
-	pass, errMsg = validations.GreaterThanZero(amountStr, "货币金额")
+	pass, errMsg = apiParamValidation.GreaterThanZero(amountStr, "货币金额")
 	if !pass {
 		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
 	nominalValueStr := context.Query("nominalValue")
-	pass, errMsg = validations.GreaterThanZero(nominalValueStr, "货币单位")
+	pass, errMsg = apiParamValidation.GreaterThanZero(nominalValueStr, "货币单位")
 	if !pass {
 		utils.IllegalArgumentErrorResp(errMsg, context)
 		return
