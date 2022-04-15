@@ -80,8 +80,8 @@ func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWei
 	data.CurrencyName = record.CurrencyName
 	data.NominalValue = record.NominalValue
 	data.WeightInGram = record.WeightInGram.Mul(pieceCount)
-	data.WeightInKiloGram = data.WeightInGram.Div(constants.ONE_THOUSAND)
-	data.WeightInTon = data.WeightInGram.Div(constants.ONE_THOUSAND).Div(constants.ONE_THOUSAND)
-	data.WeightInPound = data.WeightInGram.Div(constants.ONE_THOUSAND).Mul(decimal.NewFromFloat(2.204))
+	data.WeightInKiloGram = data.WeightInGram.Div(constants.OneThousand)
+	data.WeightInTon = data.WeightInGram.Div(constants.OneThousand).Div(constants.OneThousand)
+	data.WeightInPound = data.WeightInGram.Div(constants.OneThousand).Mul(decimal.NewFromFloat(2.204))
 	return *data, nil
 }

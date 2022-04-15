@@ -16,12 +16,12 @@ func CostTime() gin.HandlerFunc {
 		ctx.Next()
 
 		setting.MetadataLogger.WithFields(logrus.Fields{
-			"cost":             time.Since(startTime).Milliseconds(),
-			"ip":               ctx.ClientIP(),
-			"method":           ctx.Request.Method,
-			"uri":              ctx.Request.RequestURI,
-			constants.TRACE_ID: setting.GetTraceId(),
-			"usage":            "metadata",
+			"cost":            time.Since(startTime).Milliseconds(),
+			"ip":              ctx.ClientIP(),
+			"method":          ctx.Request.Method,
+			"uri":             ctx.Request.RequestURI,
+			constants.TraceId: setting.GetTraceId(),
+			"usage":           "metadata",
 		}).Info("requestMetadata")
 
 		setting.RemoveTraceId()
