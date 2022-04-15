@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func CostTime() gin.HandlerFunc {
+func RecordCostTime() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		startTime := time.Now()
 

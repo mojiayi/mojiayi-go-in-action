@@ -112,7 +112,7 @@ func (m *MyLogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 
 var localTraceId = routine.NewLocalStorage()
 
-func PutTraceIdAsHeader() gin.HandlerFunc {
+func PutTraceIdIntoLocalStorage() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		GetTraceId()
 
