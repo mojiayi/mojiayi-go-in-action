@@ -4,17 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-basic/uuid"
 	"github.com/go-eden/routine"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/ini.v1"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	"os"
-	"strings"
-
-	"github.com/sirupsen/logrus"
-	"gopkg.in/ini.v1"
 )
 
 var mySQLSetting = &MySQLConfig{}
@@ -69,19 +70,17 @@ func initLog(path string, filename string) *logrus.Logger {
 	log.Formatter = &MyLogFormatter{}
 
 	filepath := path + filename
-	var file *os.File
-	var err error
-	if _, err = os.Stat(filepath); os.IsNotExist(err) {
-		file, err = os.Create(filepath)
-	} else {
-		file, err = os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-	}
+	writer, err := rotatelogs.New(
+		filepath+".%Y%m%d",
+		rotatelogs.WithLinkName(filepath),
+		rotatelogs.WithRotationTime(time.Duration(24)*time.Hour),
+	)
 
 	if err != nil {
 		fmt.Println("fail to open log file " + filepath)
 	}
 
-	log.Out = file
+	log.SetOutput(writer)
 	log.Level = logrus.InfoLevel
 
 	return log
