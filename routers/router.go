@@ -19,6 +19,7 @@ func InitRouters() *gin.Engine {
 
 	router.Use(setting.PutTraceIdIntoLocalStorage())
 	router.Use(middlewire.RecordCostTime())
+	router.Use(middlewire.Recover)
 
 	currencyV1 := router.Group("/api/v1/currency")
 	{
