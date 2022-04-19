@@ -2,6 +2,7 @@ package v1
 
 import (
 	"mojiayi-the-rich/constants"
+	"mojiayi-the-rich/dao/mapper"
 	"mojiayi-the-rich/param"
 	"mojiayi-the-rich/routers/api/validations"
 	"mojiayi-the-rich/setting"
@@ -17,29 +18,30 @@ import (
 )
 
 type CurrencyWeightService struct {
+	apiParamValidation validations.ApiParamValidation
+	respUtil           utils.RespUtil
+	currencyInfoMapper mapper.CurrencyInfoMapper
 }
-
-var apiParamValidation validations.ApiParamValidation
 
 func (c *CurrencyWeightService) CalculateWeight(context *gin.Context) {
 	currencyCode := context.Query("currencyCode")
-	pass, errMsg := apiParamValidation.NotEmpty(currencyCode, "货币代号")
+	pass, errMsg := c.apiParamValidation.NotEmpty(currencyCode, "货币代号")
 	if !pass {
-		utils.IllegalArgumentErrorResp(errMsg, context)
+		c.respUtil.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
 	amountStr := context.Query("amount")
-	pass, errMsg = apiParamValidation.GreaterThanZero(amountStr, "货币金额")
+	pass, errMsg = c.apiParamValidation.GreaterThanZero(amountStr, "货币金额")
 	if !pass {
-		utils.IllegalArgumentErrorResp(errMsg, context)
+		c.respUtil.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
 	nominalValueStr := context.Query("nominalValue")
-	pass, errMsg = apiParamValidation.GreaterThanZero(nominalValueStr, "货币单位")
+	pass, errMsg = c.apiParamValidation.GreaterThanZero(nominalValueStr, "货币单位")
 	if !pass {
-		utils.IllegalArgumentErrorResp(errMsg, context)
+		c.respUtil.IllegalArgumentErrorResp(errMsg, context)
 		return
 	}
 
@@ -57,16 +59,16 @@ func (c *CurrencyWeightService) CalculateWeight(context *gin.Context) {
 	currencyParam.SetClientAgent(context.Request.UserAgent())
 	currencyParam.SetClientIP(context.ClientIP())
 
-	currencyWeightVO, err := calculateWeight(currencyParam)
+	currencyWeightVO, err := c.calculateWeight(currencyParam)
 	if err != nil {
-		utils.ErrorResp(http.StatusGone, err.Error(), context)
+		c.respUtil.ErrorResp(http.StatusGone, err.Error(), context)
 		return
 	}
-	utils.SuccessResp(currencyWeightVO, context)
+	c.respUtil.SuccessResp(currencyWeightVO, context)
 }
 
-func calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
-	record, err := currencyInfoMapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
+func (c *CurrencyWeightService) calculateWeight(param param.CurrencyParam) (currencyWeightVO vo.CurrencyWeightVO, err error) {
+	record, err := c.currencyInfoMapper.SelectByCurrencyCode(param.GetCurrencyCode(), param.GetNominalValue())
 	data := new(vo.CurrencyWeightVO)
 	if err != nil {
 		setting.MyLogger.Info("货币不存在,currencyCode=", param.GetCurrencyCode(), ",nominalValue=", param.GetNominalValue())

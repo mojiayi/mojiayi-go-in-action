@@ -9,7 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func IllegalArgumentErrorResp(msg string, context *gin.Context) {
+type RespUtil struct {
+}
+
+func (r *RespUtil) IllegalArgumentErrorResp(msg string, context *gin.Context) {
 	var resp = *new(vo.BaseVO)
 	resp.SetCode(http.StatusBadRequest)
 	resp.SetMsg(msg)
@@ -19,7 +22,7 @@ func IllegalArgumentErrorResp(msg string, context *gin.Context) {
 	context.JSON(http.StatusOK, resp)
 }
 
-func ErrorResp(code int, msg string, context *gin.Context) {
+func (r *RespUtil) ErrorResp(code int, msg string, context *gin.Context) {
 	var resp = *new(vo.BaseVO)
 	resp.SetCode(code)
 	resp.SetMsg(msg)
@@ -29,7 +32,7 @@ func ErrorResp(code int, msg string, context *gin.Context) {
 	context.JSON(http.StatusOK, resp)
 }
 
-func SuccessResp(data interface{}, context *gin.Context) {
+func (r *RespUtil) SuccessResp(data interface{}, context *gin.Context) {
 	var resp = vo.BaseVO{}
 	resp.SetCode(http.StatusOK)
 	resp.SetMsg(http.StatusText(http.StatusOK))
