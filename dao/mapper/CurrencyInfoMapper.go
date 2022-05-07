@@ -2,10 +2,11 @@ package mapper
 
 import (
 	"errors"
-	"github.com/shopspring/decimal"
 	"mojiayi-the-rich/dao/domain"
 	"mojiayi-the-rich/setting"
 	"mojiayi-the-rich/utils"
+
+	"github.com/shopspring/decimal"
 )
 
 type CurrencyInfoMapper struct {

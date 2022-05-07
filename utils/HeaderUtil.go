@@ -6,7 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetHeaderValue(headerKey string, context *gin.Context) (headerValue string) {
+type HeaderUtil struct {
+}
+
+func (h *HeaderUtil) GetHeaderValue(headerKey string, context *gin.Context) (headerValue string) {
 	headerValue = context.Request.Header.Get(headerKey)
 	if len(headerValue) == 0 {
 		setting.MyLogger.Info("header中没有headerKey=", headerKey)

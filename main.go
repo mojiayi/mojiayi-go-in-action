@@ -13,6 +13,6 @@ func main() {
 
 	err := router.Run(":8080")
 	if err != nil {
-		fmt.Errorf("启动失败,err=%v", err)
+		fmt.Printf("启动失败,err=%v", err)
 	}
 }
